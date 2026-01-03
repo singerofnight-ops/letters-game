@@ -1,0 +1,564 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Star, ChevronLeft, Volume2, RotateCcw, Check, X, Sparkles, Loader2 } from 'lucide-react';
+
+// --- GEMINI API CONFIGURATION ---
+const apiKey = ""; // API ключ подставится автоматически
+
+// --- DATA & CONTENT ---
+const shuffleArray = (array) => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
+// Базовая база слов (резерв)
+const WORD_DATABASE = {
+  'З': [
+    { id: 1, word: 'ЗАЯЦ', position: 'start', emoji: '🐰' },
+    { id: 2, word: 'ЗУБ', position: 'start', emoji: '🦷' },
+    { id: 3, word: 'КОЗА', position: 'middle', emoji: '🐐' },
+    { id: 4, word: 'РОЗА', position: 'middle', emoji: '🌹' },
+    { id: 5, word: 'АЛМАЗ', position: 'end', emoji: '💎' },
+    { id: 6, word: 'ГЛАЗ', position: 'end', emoji: '👁️' },
+  ],
+  'Л': [
+    { id: 7, word: 'ЛУНА', position: 'start', emoji: '🌒' },
+    { id: 8, word: 'ЛАМПА', position: 'start', emoji: '💡' },
+    { id: 9, word: 'АКУЛА', position: 'middle', emoji: '🦈' },
+    { id: 10, word: 'БЕЛКА', position: 'middle', emoji: '🐿️' },
+    { id: 11, word: 'СТОЛ', position: 'end', emoji: '🪑' },
+    { id: 12, word: 'ПОЛ', position: 'end', emoji: '⬇️' },
+  ],
+  'Б': [
+    { id: 13, word: 'БАНАН', position: 'start', emoji: '🍌' },
+    { id: 14, word: 'БАРАБАН', position: 'start', emoji: '🥁' },
+    { id: 15, word: 'СОБАКА', position: 'middle', emoji: '🐕' },
+    { id: 16, word: 'РЫБА', position: 'middle', emoji: '🐟' },
+    { id: 17, word: 'ГРИБ', position: 'end', emoji: '🍄' },
+    { id: 18, word: 'ДУБ', position: 'end', emoji: '🌳' },
+  ],
+  'П': [
+    { id: 19, word: 'ПАУК', position: 'start', emoji: '🕷️' },
+    { id: 20, word: 'ПОМИДОР', position: 'start', emoji: '🍅' },
+    { id: 21, word: 'ЛОПАТА', position: 'middle', emoji: '🪣' },
+    { id: 22, word: 'ШАПКА', position: 'middle', emoji: '🧢' },
+    { id: 23, word: 'СУП', position: 'end', emoji: '🥣' },
+    { id: 24, word: 'УКРОП', position: 'end', emoji: '🌿' },
+  ],
+  'Д': [
+    { id: 25, word: 'ДОМ', position: 'start', emoji: '🏠' },
+    { id: 26, word: 'ДЫНЯ', position: 'start', emoji: '🍈' },
+    { id: 27, word: 'ВЕДРО', position: 'middle', emoji: '🪣' },
+    { id: 28, word: 'ПОДАРОК', position: 'middle', emoji: '🎁' },
+    { id: 29, word: 'САД', position: 'end', emoji: '🌳' },
+    { id: 30, word: 'ЛЁД', position: 'end', emoji: '🧊' },
+  ],
+  // Для остальных букв заглушки
+  ...Array.from({ length: 32 }, (_, i) => {
+     const char = String.fromCharCode(1040 + i); 
+     if (['З','Л','Б','П','Д','Ё','Й','Ъ','Ы','Ь'].includes(char)) return {};
+     return { [char]: [] };
+  }).reduce((acc, curr) => ({...acc, ...curr}), {})
+};
+
+const ALPHABET = [
+  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й',
+  'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф',
+  'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'
+];
+
+// Утилита для конвертации base64 в PCM и воспроизведения
+const playAudioFromBase64 = (base64String) => {
+    try {
+        const binaryString = window.atob(base64String);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        // Создаем WAV заголовок для PCM данных (16-bit, 24kHz, mono)
+        // Gemini TTS обычно возвращает 24000Hz
+        const wavHeader = new ArrayBuffer(44);
+        const view = new DataView(wavHeader);
+        const sampleRate = 24000; 
+        const numChannels = 1;
+        
+        const writeString = (view, offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + bytes.length, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * numChannels * 2, true);
+        view.setUint16(32, numChannels * 2, true);
+        view.setUint16(34, 16, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, bytes.length, true);
+
+        const blob = new Blob([view, bytes], { type: 'audio/wav' });
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.play();
+    } catch (error) {
+        console.error("Ошибка воспроизведения аудио:", error);
+    }
+};
+
+export default function App() {
+  const [currentScreen, setCurrentScreen] = useState('menu');
+  const [selectedLetter, setSelectedLetter] = useState(null);
+  const [currentWordsList, setCurrentWordsList] = useState([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isWordRevealed, setIsWordRevealed] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const [score, setScore] = useState(0);
+  
+  // States for AI features
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [generatedError, setGeneratedError] = useState(null);
+
+  const currentWord = currentWordsList[currentWordIndex];
+
+  // --- GEMINI FUNCTIONS ---
+
+  const generateAIWord = async () => {
+    if (!selectedLetter) return;
+    setIsGenerating(true);
+    setGeneratedError(null);
+
+    try {
+        const prompt = `
+            Generate one simple Russian noun for a child that contains the letter '${selectedLetter}'. 
+            IMPORTANT: The consonant sound for '${selectedLetter}' in this word must be HARD (твёрдый). 
+            Avoid words where '${selectedLetter}' is soft.
+            Ideally, pick a word that is NOT in this list: ${currentWordsList.map(w => w.word).join(', ')}.
+            Return ONLY a valid JSON object with this structure (no markdown): 
+            { "word": "WORD", "position": "start" | "middle" | "end", "emoji": "emoji" }
+        `;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { responseMimeType: "application/json" }
+            })
+        });
+
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (text) {
+            const newWordData = JSON.parse(text);
+            // Добавляем ID и гарантируем формат
+            const newCard = {
+                id: Date.now(),
+                word: newWordData.word.toUpperCase(),
+                position: newWordData.position,
+                emoji: newWordData.emoji
+            };
+            
+            // Добавляем новое слово в текущий список и переключаемся на него
+            const newList = [...currentWordsList, newCard];
+            setCurrentWordsList(newList);
+            setCurrentWordIndex(newList.length - 1); // Переходим к новому слову
+            setIsWordRevealed(false);
+            setFeedback(null);
+        }
+    } catch (error) {
+        console.error("Gemini Generation Error:", error);
+        setGeneratedError("Не удалось придумать слово. Попробуй еще раз!");
+    } finally {
+        setIsGenerating(false);
+    }
+  };
+
+  const speakWord = async (text) => {
+    if (isSpeaking) return;
+    setIsSpeaking(true);
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: `Слово: ${text}` }] }],
+                generationConfig: { 
+                    responseModalities: ["AUDIO"],
+                    speechConfig: { 
+                        voiceConfig: { 
+                            prebuiltVoiceConfig: { voiceName: "Kore" } 
+                        } 
+                    } 
+                }
+            })
+        });
+
+        const data = await response.json();
+        const audioContent = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
+        if (audioContent) {
+            playAudioFromBase64(audioContent);
+        }
+    } catch (error) {
+        console.error("TTS Error:", error);
+    } finally {
+        setIsSpeaking(false);
+    }
+  };
+
+
+  // --- GAME LOGIC ---
+
+  const startGame = (letter) => {
+    const words = WORD_DATABASE[letter];
+    // Если слов нет, создаем пустой массив, чтобы можно было генерировать AI слова
+    const initialList = words && words.length > 0 ? shuffleArray(words) : [];
+    
+    if (initialList.length === 0) {
+        // Если база пустая, сразу предлагаем сгенерировать
+        // Но для демо оставим alert, если база совсем пуста, но дадим войти
+        if (!confirm(`Для буквы "${letter}" пока нет слов в базе. Хотите, чтобы AI придумал слова?`)) {
+            return;
+        }
+    }
+
+    setSelectedLetter(letter);
+    setCurrentWordsList(initialList);
+    setCurrentWordIndex(0);
+    setIsWordRevealed(false);
+    setFeedback(null);
+    setCurrentScreen('game');
+  };
+
+  const checkAnswer = (selectedPos) => {
+    if (!currentWord) return;
+    if (feedback === 'correct') return;
+
+    if (selectedPos === currentWord.position) {
+      setFeedback('correct');
+      setScore(s => s + 1);
+    } else {
+      setFeedback('wrong');
+    }
+  };
+
+  const nextCard = () => {
+    if (currentWordIndex < currentWordsList.length - 1) {
+      setCurrentWordIndex(prev => prev + 1);
+      setIsWordRevealed(false);
+      setFeedback(null);
+    } else {
+      // Предложить сгенерировать еще
+      if(confirm("Слова закончились! Хочешь, чтобы я придумал новое волшебное слово?")) {
+          generateAIWord();
+      } else {
+          setCurrentScreen('menu');
+      }
+    }
+  };
+
+  // --- COMPONENTS ---
+
+  const Train = () => {
+    const getWindowStyle = (pos) => {
+        let baseStyle = 'bg-yellow-100 border-yellow-300';
+        const isCorrect = currentWord && feedback === 'correct' && currentWord.position === pos;
+        const isWrong = feedback === 'wrong';
+        
+        if (isCorrect) {
+            baseStyle = 'bg-green-400 border-green-500 shadow-[0_0_25px_rgba(74,222,128,0.9)] animate-pulse';
+        } else if (isWrong) {
+            baseStyle = 'bg-gray-200 border-gray-300 opacity-70';
+        }
+        return `${baseStyle} transition-all duration-300 flex items-center justify-center`;
+    };
+
+    const Wagon = ({ color, positionLabel, onClick, zIndex, isLocomotive = false }) => {
+        const windowStyle = getWindowStyle(positionLabel === 'НАЧАЛО' ? 'start' : positionLabel === 'СЕРЕДИНА' ? 'middle' : 'end');
+        
+        if (isLocomotive) {
+             return (
+                <div 
+                    onClick={onClick}
+                    className={`relative flex flex-col items-center z-30 mr-1 group cursor-pointer active:scale-95 transition-transform`}
+                >
+                     <div className="w-32 h-36 rounded-xl border-4 border-red-800 bg-red-600 flex flex-col items-center justify-end relative shadow-xl pb-2">
+                         <div className="absolute -top-10 left-6 w-8 h-12 bg-red-800 rounded-t-lg border-2 border-red-900">
+                             <div className="absolute -top-4 left-2 w-6 h-4 bg-gray-100 rounded-full opacity-60 animate-ping"></div>
+                             <div className="absolute -top-8 left-0 w-10 h-6 bg-white rounded-full opacity-40 animate-pulse"></div>
+                         </div>
+                         <div className="absolute -top-2 left-0 right-0 h-4 bg-red-900 rounded-t-lg"></div>
+                         <div className={`mb-3 w-20 h-14 rounded-lg border-4 ${windowStyle}`}>
+                             <span className="text-[10px] font-bold text-gray-700">{positionLabel}</span>
+                         </div>
+                         <div className="absolute -left-3 bottom-0 w-6 h-16 bg-gray-700 rounded-l-lg transform skew-x-12 flex flex-col justify-end pb-2 gap-1">
+                             <div className="w-full h-1 bg-yellow-400 opacity-50"></div>
+                             <div className="w-full h-1 bg-yellow-400 opacity-50"></div>
+                         </div>
+                     </div>
+                     <div className="flex gap-1 -mb-6 z-20 ml-4">
+                        <div className="w-14 h-14 bg-gray-900 rounded-full border-[5px] border-gray-500 flex items-center justify-center animate-[spin_5s_linear_infinite]">
+                            <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                        </div>
+                        <div className="w-10 h-10 bg-gray-900 rounded-full border-[4px] border-gray-500 flex items-center justify-center animate-[spin_5s_linear_infinite] self-end mb-1">
+                            <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+             );
+        }
+        return (
+            <div 
+                onClick={onClick}
+                className={`relative flex flex-col items-center group transition-transform active:scale-95 cursor-pointer ${zIndex}`}
+            >
+                <div className={`w-32 h-28 rounded-xl border-4 border-${color}-700 bg-${color}-500 flex items-center justify-center relative shadow-lg`}>
+                        <div className={`absolute -top-2 left-0 right-0 h-3 bg-${color}-800 rounded-t-lg`}></div>
+                        <div className={`w-20 h-14 rounded-md border-4 ${windowStyle}`}>
+                             <span className="text-[10px] font-bold text-gray-600">{positionLabel}</span>
+                        </div>
+                </div>
+                <div className="absolute -left-4 bottom-8 w-6 h-3 bg-gray-800 rounded-full shadow-inner"></div>
+                <div className="flex gap-4 -mb-5 z-20">
+                    <div className="w-10 h-10 bg-gray-900 rounded-full border-[4px] border-gray-400 flex items-center justify-center animate-[spin_5s_linear_infinite]">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    </div>
+                    <div className="w-10 h-10 bg-gray-900 rounded-full border-[4px] border-gray-400 flex items-center justify-center animate-[spin_5s_linear_infinite]">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    return (
+      <div className="relative mt-16 w-full max-w-3xl mx-auto p-4 flex flex-col items-center">
+        <div className="flex items-end relative z-10 gap-2">
+            <Wagon isLocomotive={true} positionLabel="НАЧАЛО" onClick={() => checkAnswer('start')} />
+            <Wagon color="blue" positionLabel="СЕРЕДИНА" onClick={() => checkAnswer('middle')} zIndex="z-20" />
+            <Wagon color="green" positionLabel="КОНЕЦ" onClick={() => checkAnswer('end')} zIndex="z-10" />
+        </div>
+        <div className="relative w-full h-4 bg-gray-600 rounded-full mt-7 overflow-hidden border-t-2 border-gray-400"></div>
+        <div className="flex justify-between w-[110%] -ml-[5%] px-2 -mt-4 relative z-0">
+            {[...Array(25)].map((_, i) => (
+                <div key={i} className="w-3 h-5 bg-amber-900 rounded-sm shadow-sm"></div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
+  // --- RENDER ---
+  const backgroundStyle = {
+      backgroundImage: `url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1600 800"%3E%3Cdefs%3E%3CradialGradient id="sky" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"%3E%3Cstop offset="0%" style="stop-color:%23d6e9f4;stop-opacity:1"/%3E%3Cstop offset="100%" style="stop-color:%2387b8d4;stop-opacity:1"/%3E%3C/radialGradient%3E%3CradialGradient id="sun" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"%3E%3Cstop offset="0%" style="stop-color:%23fff7cc;stop-opacity:1"/%3E%3Cstop offset="80%" style="stop-color:%23ffeb3b;stop-opacity:1"/%3E%3Cstop offset="100%" style="stop-color:%23fdd835;stop-opacity:0"/%3E%3C/radialGradient%3E%3Cfilter id="watercolor"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise"/%3E%3CfeDisplacementMap in="SourceGraphic" in2="noise" scale="15" /%3E%3C/filter%3E%3C/defs%3E%3Crect width="100%" height="100%" fill="url(%23sky)" filter="url(%23watercolor)" opacity="0.6"/%3E%3C!-- SUN --%3E%3Ccircle cx="150" cy="150" r="80" fill="url(%23sun)" filter="url(%23watercolor)" opacity="0.9" /%3E%3C!-- FOREST BACK LAYER --%3E%3Cg opacity="0.5" transform="translate(0, 50)"%3E%3Cpath d="M-100 600 L180 300 L440 600 Z" fill="%23a8d5ba" filter="url(%23watercolor)"/%3E%3Cpath d="M300 650 L580 350 L860 650 Z" fill="%238fc0a5" filter="url(%23watercolor)"/%3E%3Cpath d="M700 600 L1000 320 L1300 600 Z" fill="%237cae92" filter="url(%23watercolor)"/%3E%3Cpath d="M1100 630 L1350 380 L1700 630 Z" fill="%23a8d5ba" filter="url(%23watercolor)"/%3E%3C/g%3E%3C!-- FOREST FRONT LAYER --%3E%3Cg opacity="0.7" transform="translate(0, 100)"%3E%3Cpath d="M0 800 L100 500 L200 800 Z" fill="%232e7d32" filter="url(%23watercolor)"/%3E%3Cpath d="M150 800 L300 450 L450 800 Z" fill="%2343a047" filter="url(%23watercolor)"/%3E%3Cpath d="M400 800 L600 550 L800 800 Z" fill="%232e7d32" filter="url(%23watercolor)"/%3E%3Cpath d="M750 800 L950 480 L1150 800 Z" fill="%2343a047" filter="url(%23watercolor)"/%3E%3Cpath d="M1100 800 L1300 520 L1500 800 Z" fill="%232e7d32" filter="url(%23watercolor)"/%3E%3Cpath d="M1450 800 L1600 500 L1750 800 Z" fill="%2343a047" filter="url(%23watercolor)"/%3E%3C/g%3E%3C/svg%3E')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center bottom'
+  };
+
+  if (currentScreen === 'menu') {
+    return (
+      <div className="min-h-screen p-4 font-sans flex flex-col items-center relative" style={backgroundStyle}>
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-0"></div>
+        <header className="mb-8 text-center bg-white/90 p-6 rounded-3xl shadow-xl border-4 border-blue-200 w-full max-w-2xl relative z-10 backdrop-blur-md">
+          <h1 className="text-4xl font-extrabold text-blue-700 flex items-center justify-center gap-3 drop-shadow-sm">
+             🚂 Звуковой Паровозик
+          </h1>
+          <p className="text-blue-500 mt-3 text-lg font-medium">Выбери букву и найди её место в слове!</p>
+        </header>
+
+        <div className="grid grid-cols-5 sm:grid-cols-6 gap-3 max-w-2xl w-full relative z-10">
+          {ALPHABET.map((letter) => (
+            <button
+              key={letter}
+              onClick={() => startGame(letter)}
+              className={`
+                aspect-square rounded-2xl text-2xl font-extrabold shadow-[0_4px_0_0_rgba(0,0,0,0.1)] transition-all
+                hover:scale-105 active:scale-95 active:shadow-none flex items-center justify-center
+                ${WORD_DATABASE[letter] && WORD_DATABASE[letter].length > 0 
+                  ? 'bg-gradient-to-br from-white to-blue-50 text-blue-700 border-2 border-blue-300 hover:border-blue-500 hover:from-blue-100' 
+                  : 'bg-white/50 text-gray-500 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-400'}
+              `}
+            >
+              {letter}
+            </button>
+          ))}
+        </div>
+        <div className="mt-8 text-sm text-blue-800 bg-white/70 px-4 py-2 rounded-full text-center max-w-md relative z-10 font-medium">
+            * Нажми на любую букву! Если слов не хватит, <span className="inline-flex items-center gap-1 font-bold text-purple-600"><Sparkles size={14}/> Волшебный AI</span> придумает новые!
+        </div>
+      </div>
+    );
+  }
+
+  // Если вдруг currentWord нет (пустой массив после инициализации), покажем лоадер или кнопку генерации
+  if (!currentWord && !isGenerating) {
+       return (
+         <div className="min-h-screen p-4 flex flex-col items-center justify-center relative" style={backgroundStyle}>
+            <div className="bg-white/90 p-8 rounded-3xl shadow-xl text-center z-10 max-w-md">
+                <h2 className="text-2xl font-bold text-blue-800 mb-4">Слова закончились!</h2>
+                <p className="mb-6 text-gray-600">Для буквы "{selectedLetter}" слов в базе пока нет.</p>
+                <div className="flex flex-col gap-3">
+                    <button 
+                        onClick={generateAIWord}
+                        className="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-700 flex items-center justify-center gap-2"
+                    >
+                        <Sparkles /> Придумать слово (AI)
+                    </button>
+                    <button 
+                        onClick={() => setCurrentScreen('menu')}
+                        className="bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-300"
+                    >
+                        Вернуться в меню
+                    </button>
+                </div>
+            </div>
+         </div>
+       )
+  }
+
+  return (
+    <div className="min-h-screen p-4 font-sans flex flex-col items-center relative overflow-hidden" style={backgroundStyle}>
+       <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-0"></div>
+      
+      {/* HEADER */}
+      <div className="w-full max-w-lg flex justify-between items-center mb-6 relative z-10">
+        <button 
+          onClick={() => setCurrentScreen('menu')}
+          className="p-2 bg-white/80 rounded-full shadow-md hover:bg-white transition-colors"
+        >
+          <ChevronLeft className="text-blue-700 w-6 h-6" />
+        </button>
+        <div className="text-3xl font-extrabold text-blue-800 bg-white/80 px-8 py-3 rounded-full shadow-md border-2 border-blue-200 backdrop-blur-md">
+           Буква "{selectedLetter}"
+        </div>
+        <div className="flex items-center gap-1 bg-yellow-400/90 px-4 py-2 rounded-full shadow-md border-2 border-yellow-200">
+            <Star className="w-5 h-5 text-white fill-current" />
+            <span className="font-black text-white text-xl">{score}</span>
+        </div>
+      </div>
+
+      {/* ERROR DISPLAY */}
+      {generatedError && (
+          <div className="relative z-20 mb-4 bg-red-100 text-red-700 px-4 py-2 rounded-lg border border-red-300 flex items-center gap-2 animate-shake">
+              <X size={16} /> {generatedError}
+          </div>
+      )}
+
+      {/* FLASHCARD AREA */}
+      <div className="flex-1 w-full max-w-lg flex flex-col items-center justify-center mb-4 relative z-10">
+        
+        {isGenerating ? (
+            <div className="w-72 h-72 rounded-[2.5rem] bg-white/80 backdrop-blur border-[6px] border-purple-200 flex flex-col items-center justify-center animate-pulse shadow-xl">
+                <Loader2 className="w-16 h-16 text-purple-600 animate-spin mb-4" />
+                <span className="text-purple-800 font-bold text-lg">Придумываю слово...</span>
+            </div>
+        ) : (
+            <div className="relative group perspective-1000 w-72 h-72">
+                 {/* Card Container */}
+                <div 
+                  onClick={() => setIsWordRevealed(!isWordRevealed)}
+                  className={`
+                    cursor-pointer
+                    relative w-full h-full duration-500 preserve-3d transition-all
+                    bg-gradient-to-br from-white to-gray-50 rounded-[2.5rem] shadow-2xl border-[6px] border-white flex flex-col items-center justify-center p-6
+                    ${isWordRevealed ? 'rotate-y-180' : ''}
+                `}>
+                    {/* Image Placeholder */}
+                    <div className="text-[10rem] filter drop-shadow-lg transform group-hover:scale-105 transition-transform">
+                        {currentWord?.emoji}
+                    </div>
+                    
+                    {/* Hint Text */}
+                    <div className="absolute bottom-5 bg-white/60 px-3 py-1 rounded-full text-gray-500 text-sm flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                        <span className="font-medium">Нажми, чтобы увидеть слово</span>
+                    </div>
+
+                    {/* Hidden Word Overlay */}
+                    {isWordRevealed && (
+                    <div className="absolute inset-0 bg-white/95 backdrop-blur-md rounded-[2.3rem] flex items-center justify-center z-10 animate-fade-in border-[6px] border-blue-200">
+                        <span className="text-4xl font-black text-blue-900 tracking-wider uppercase drop-shadow-sm text-center px-2">
+                            {currentWord?.word}
+                        </span>
+                    </div>
+                    )}
+                </div>
+
+                {/* AI ACTION BUTTONS (Floating around card) */}
+                <div className="absolute -right-16 top-0 flex flex-col gap-3">
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); generateAIWord(); }}
+                        disabled={isGenerating}
+                        className="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-lg hover:bg-purple-600 active:scale-95 transition-all border-2 border-purple-300"
+                        title="Придумать новое слово (AI)"
+                    >
+                        {isGenerating ? <Loader2 className="animate-spin" size={20}/> : <Sparkles size={24} />}
+                    </button>
+                    
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); speakWord(currentWord?.word); }}
+                        disabled={isSpeaking}
+                        className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all border-2
+                            ${isSpeaking ? 'bg-green-600 text-white border-green-400' : 'bg-blue-500 text-white hover:bg-blue-600 border-blue-300'}
+                        `}
+                        title="Произнести слово"
+                    >
+                         {isSpeaking ? <Loader2 className="animate-spin" size={20}/> : <Volume2 size={24} />}
+                    </button>
+                </div>
+            </div>
+        )}
+
+        {/* FEEDBACK MESSAGE */}
+        <div className="h-16 mt-6 flex items-center justify-center min-w-[300px]">
+            {feedback === 'correct' && (
+                <div className="flex items-center gap-3 text-green-600 bg-green-100/80 px-6 py-3 rounded-2xl font-extrabold text-2xl animate-bounce shadow-lg border-2 border-green-300 backdrop-blur-sm">
+                    <Check size={32} strokeWidth={3} />
+                    <span>Правильно!</span>
+                </div>
+            )}
+            {feedback === 'wrong' && (
+                <div className="flex items-center gap-3 text-red-600 bg-red-100/80 px-6 py-3 rounded-2xl font-extrabold text-2xl animate-shake shadow-lg border-2 border-red-300 backdrop-blur-sm">
+                    <X size={32} strokeWidth={3} />
+                    <span>Попробуй ещё раз</span>
+                </div>
+            )}
+            {!feedback && !isGenerating && (
+                <span className="text-blue-800 bg-white/60 px-6 py-3 rounded-full text-xl font-bold shadow-sm backdrop-blur-sm">Где звук "{selectedLetter}"?</span>
+            )}
+        </div>
+
+      </div>
+
+      {/* TRAIN INTERFACE */}
+      <div className="w-full pb-8 relative z-10">
+          <Train />
+          
+          {feedback === 'correct' && (
+            <div className="flex justify-center mt-8 gap-4">
+                <button 
+                    onClick={nextCard}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-10 py-4 rounded-2xl font-extrabold text-xl shadow-[0_6px_0_0_#1e40af] hover:shadow-[0_3px_0_0_#1e40af] hover:translate-y-1 transition-all flex items-center gap-3 border-2 border-blue-400"
+                >
+                    Следующее слово <ChevronLeft className="rotate-180 w-7 h-7" strokeWidth={3} />
+                </button>
+            </div>
+          )}
+      </div>
+
+    </div>
+  );
+}
