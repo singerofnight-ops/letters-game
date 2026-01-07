@@ -106,9 +106,25 @@
                 { id: 29, word: 'САД', position: 'end', emoji: '🌳' },
                 { id: 30, word: 'ЛЁД', position: 'end', emoji: '🧊' },
             ],
+            'Я': [
+                { id: 31, word: 'ЯБЛОКО', position: 'start', emoji: '🍎' },
+                { id: 32, word: 'ЯКОРЬ', position: 'start', emoji: '⚓' },
+                { id: 33, word: 'МАЯК', position: 'middle', emoji: '🗼' },
+                { id: 34, word: 'ПОЯС', position: 'middle', emoji: '🥋' },
+                { id: 35, word: 'ЗМЕЯ', position: 'end', emoji: '🐍' },
+                { id: 36, word: 'ФЕЯ', position: 'end', emoji: '🧚‍♀️' },
+            ],
+            'Ч': [
+                { id: 37, word: 'ЧАСЫ', position: 'start', emoji: '⏰' },
+                { id: 38, word: 'ЧАШКА', position: 'start', emoji: '☕' },
+                { id: 39, word: 'ТУЧА', position: 'middle', emoji: '☁️' },
+                { id: 40, word: 'ПЕЧКА', position: 'middle', emoji: '🔥' },
+                { id: 41, word: 'МЯЧ', position: 'end', emoji: '⚽' },
+                { id: 42, word: 'КЛЮЧ', position: 'end', emoji: '🔑' },
+            ],
             ...Array.from({ length: 32 }, (_, i) => {
                 const char = String.fromCharCode(1040 + i); 
-                if (['З','Л','Б','П','Д','Ё','Й','Ъ','Ы','Ь'].includes(char)) return {};
+                if (['З','Л','Б','П','Д','Я','Ч','Ё','Й','Ъ','Ы','Ь'].includes(char)) return {};
                 return { [char]: [] };
             }).reduce((acc, curr) => ({...acc, ...curr}), {})
         };
