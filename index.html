@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -66,21 +67,13 @@
         };
 
         const WORD_DATABASE = {
-            'З': [
-                { id: 1, word: 'ЗАЯЦ', position: 'start', emoji: '🐰' },
-                { id: 2, word: 'ЗУБ', position: 'start', emoji: '🦷' },
-                { id: 3, word: 'КОЗА', position: 'middle', emoji: '🐐' },
-                { id: 4, word: 'РОЗА', position: 'middle', emoji: '🌹' },
-                { id: 5, word: 'АЛМАЗ', position: 'end', emoji: '💎' },
-                { id: 6, word: 'ГЛАЗ', position: 'end', emoji: '👁️' },
-            ],
-            'Л': [
-                { id: 7, word: 'ЛУНА', position: 'start', emoji: '🌒' },
-                { id: 8, word: 'ЛАМПА', position: 'start', emoji: '💡' },
-                { id: 9, word: 'АКУЛА', position: 'middle', emoji: '🦈' },
-                { id: 10, word: 'БЕЛКА', position: 'middle', emoji: '🐿️' },
-                { id: 11, word: 'СТОЛ', position: 'end', emoji: '🪑' },
-                { id: 12, word: 'ПОЛ', position: 'end', emoji: '⬇️' },
+            'А': [
+                { id: 61, word: 'АРБУЗ', position: 'start', emoji: '🍉' },
+                { id: 62, word: 'АВТОБУС', position: 'start', emoji: '🚌' },
+                { id: 63, word: 'МАК', position: 'middle', emoji: '🌺' },
+                { id: 64, word: 'РАК', position: 'middle', emoji: '🦞' },
+                { id: 65, word: 'ЛУНА', position: 'end', emoji: '🌒' },
+                { id: 66, word: 'РУКА', position: 'end', emoji: '🤚' },
             ],
             'Б': [
                 { id: 13, word: 'БАНАН', position: 'start', emoji: '🍌' },
@@ -90,13 +83,21 @@
                 { id: 17, word: 'ГРИБ', position: 'end', emoji: '🍄' },
                 { id: 18, word: 'ДУБ', position: 'end', emoji: '🌳' },
             ],
-            'П': [
-                { id: 19, word: 'ПАУК', position: 'start', emoji: '🕷️' },
-                { id: 20, word: 'ПОМИДОР', position: 'start', emoji: '🍅' },
-                { id: 21, word: 'ЛОПАТА', position: 'middle', emoji: '🪣' },
-                { id: 22, word: 'ШАПКА', position: 'middle', emoji: '🧢' },
-                { id: 23, word: 'СУП', position: 'end', emoji: '🥣' },
-                { id: 24, word: 'УКРОП', position: 'end', emoji: '🌿' },
+            'В': [
+                { id: 43, word: 'ВОЛК', position: 'start', emoji: '🐺' },
+                { id: 44, word: 'ВАЗА', position: 'start', emoji: '🏺' },
+                { id: 45, word: 'СОВА', position: 'middle', emoji: '🦉' },
+                { id: 46, word: 'ДИВАН', position: 'middle', emoji: '🛋️' },
+                { id: 47, word: 'ЛЕВ', position: 'end', emoji: '🦁' },
+                { id: 48, word: 'ПЛОВ', position: 'end', emoji: '🥘' },
+            ],
+            'Г': [
+                { id: 67, word: 'ГНОМ', position: 'start', emoji: '🧙‍♂️' },
+                { id: 68, word: 'ГРИБ', position: 'start', emoji: '🍄' },
+                { id: 69, word: 'ВАГОН', position: 'middle', emoji: '🚃' },
+                { id: 70, word: 'НОГА', position: 'middle', emoji: '🦶' },
+                { id: 71, word: 'САПОГ', position: 'end', emoji: '👢' },
+                { id: 72, word: 'ПИРОГ', position: 'end', emoji: '🥧' },
             ],
             'Д': [
                 { id: 25, word: 'ДОМ', position: 'start', emoji: '🏠' },
@@ -106,13 +107,157 @@
                 { id: 29, word: 'САД', position: 'end', emoji: '🌳' },
                 { id: 30, word: 'ЛЁД', position: 'end', emoji: '🧊' },
             ],
-            'Я': [
-                { id: 31, word: 'ЯБЛОКО', position: 'start', emoji: '🍎' },
-                { id: 32, word: 'ЯКОРЬ', position: 'start', emoji: '⚓' },
-                { id: 33, word: 'МАЯК', position: 'middle', emoji: '🗼' },
-                { id: 34, word: 'ПОЯС', position: 'middle', emoji: '🥋' },
-                { id: 35, word: 'ЗМЕЯ', position: 'end', emoji: '🐍' },
-                { id: 36, word: 'ФЕЯ', position: 'end', emoji: '🧚‍♀️' },
+            'Е': [
+                { id: 73, word: 'ЕНОТ', position: 'start', emoji: '🦝' },
+                { id: 74, word: 'ЕЛЬ', position: 'start', emoji: '🌲' },
+                { id: 75, word: 'ЛЕВ', position: 'middle', emoji: '🦁' },
+                { id: 76, word: 'МЕЛ', position: 'middle', emoji: '🖍️' },
+                { id: 77, word: 'ПОЛЕ', position: 'end', emoji: '🌾' },
+                { id: 78, word: 'МОРЕ', position: 'end', emoji: '🌊' },
+            ],
+            'Ё': [
+                { id: 79, word: 'ЁЛКА', position: 'start', emoji: '🎄' },
+                { id: 80, word: 'ЁЖ', position: 'start', emoji: '🦔' },
+                { id: 81, word: 'МЁД', position: 'middle', emoji: '🍯' },
+                { id: 82, word: 'ЛЁД', position: 'middle', emoji: '🧊' },
+                { id: 83, word: 'РУЖЬЁ', position: 'end', emoji: '🔫' },
+                { id: 84, word: 'БЕЛЬЁ', position: 'end', emoji: '👕' },
+            ],
+            'Ж': [
+                { id: 85, word: 'ЖУК', position: 'start', emoji: '🪲' },
+                { id: 86, word: 'ЖИРАФ', position: 'start', emoji: '🦒' },
+                { id: 87, word: 'ЛЫЖИ', position: 'middle', emoji: '🎿' },
+                { id: 88, word: 'МОРОЖЕНОЕ', position: 'middle', emoji: '🍦' },
+                { id: 89, word: 'НОЖ', position: 'end', emoji: '🔪' },
+                { id: 90, word: 'ЁЖ', position: 'end', emoji: '🦔' },
+            ],
+            'З': [
+                { id: 1, word: 'ЗАЯЦ', position: 'start', emoji: '🐰' },
+                { id: 2, word: 'ЗУБ', position: 'start', emoji: '🦷' },
+                { id: 3, word: 'КОЗА', position: 'middle', emoji: '🐐' },
+                { id: 4, word: 'РОЗА', position: 'middle', emoji: '🌹' },
+                { id: 5, word: 'АЛМАЗ', position: 'end', emoji: '💎' },
+                { id: 6, word: 'ГЛАЗ', position: 'end', emoji: '👁️' },
+            ],
+            'И': [
+                { id: 91, word: 'ИГЛА', position: 'start', emoji: '🪡' },
+                { id: 92, word: 'ИНДЮК', position: 'start', emoji: '🦃' },
+                { id: 93, word: 'КИТ', position: 'middle', emoji: '🐋' },
+                { id: 94, word: 'ЛИСА', position: 'middle', emoji: '🦊' },
+                { id: 95, word: 'ОЧКИ', position: 'end', emoji: '👓' },
+                { id: 96, word: 'КОНЬКИ', position: 'end', emoji: '⛸️' },
+            ],
+            'Й': [
+                { id: 97, word: 'ЙОГУРТ', position: 'start', emoji: '🥛' },
+                { id: 98, word: 'ЙОД', position: 'start', emoji: '🧴' },
+                { id: 99, word: 'МАЙКА', position: 'middle', emoji: '🎽' },
+                { id: 100, word: 'ЛЕЙКА', position: 'middle', emoji: '🚿' },
+                { id: 101, word: 'ТРАМВАЙ', position: 'end', emoji: '🚋' },
+                { id: 102, word: 'МУЗЕЙ', position: 'end', emoji: '🏛️' },
+            ],
+            'К': [
+                { id: 103, word: 'КОТ', position: 'start', emoji: '🐈' },
+                { id: 104, word: 'КИТ', position: 'start', emoji: '🐋' },
+                { id: 105, word: 'РАК', position: 'middle', emoji: '🦞' },
+                { id: 106, word: 'СОБАКА', position: 'middle', emoji: '🐕' },
+                { id: 107, word: 'ЛУК', position: 'end', emoji: '🧅' },
+                { id: 108, word: 'ЖУК', position: 'end', emoji: '🪲' },
+            ],
+            'Л': [
+                { id: 7, word: 'ЛУНА', position: 'start', emoji: '🌒' },
+                { id: 8, word: 'ЛАМПА', position: 'start', emoji: '💡' },
+                { id: 9, word: 'АКУЛА', position: 'middle', emoji: '🦈' },
+                { id: 10, word: 'БЕЛКА', position: 'middle', emoji: '🐿️' },
+                { id: 11, word: 'СТОЛ', position: 'end', emoji: '🪑' },
+                { id: 12, word: 'ПОЛ', position: 'end', emoji: '⬇️' },
+            ],
+            'М': [
+                { id: 109, word: 'МАШИНА', position: 'start', emoji: '🚗' },
+                { id: 110, word: 'МЕДВЕДЬ', position: 'start', emoji: '🐻' },
+                { id: 111, word: 'ЛИМОН', position: 'middle', emoji: '🍋' },
+                { id: 112, word: 'ЗАМОК', position: 'middle', emoji: '🏰' },
+                { id: 113, word: 'ДОМ', position: 'end', emoji: '🏠' },
+                { id: 114, word: 'СОМ', position: 'end', emoji: '🐟' },
+            ],
+            'Н': [
+                { id: 115, word: 'НОС', position: 'start', emoji: '👃' },
+                { id: 116, word: 'НОЖНИЦЫ', position: 'start', emoji: '✂️' },
+                { id: 117, word: 'ЛУНА', position: 'middle', emoji: '🌒' },
+                { id: 118, word: 'СОЛНЦЕ', position: 'middle', emoji: '☀️' },
+                { id: 119, word: 'СЛОН', position: 'end', emoji: '🐘' },
+                { id: 120, word: 'ТЕЛЕФОН', position: 'end', emoji: '☎️' },
+            ],
+            'О': [
+                { id: 121, word: 'ОБЛАКО', position: 'start', emoji: '☁️' },
+                { id: 122, word: 'ОСЛИК', position: 'start', emoji: '🫏' },
+                { id: 123, word: 'ДОМ', position: 'middle', emoji: '🏠' },
+                { id: 124, word: 'СОМ', position: 'middle', emoji: '🐟' },
+                { id: 125, word: 'ОКНО', position: 'end', emoji: '🪟' },
+                { id: 126, word: 'ВЕДРО', position: 'end', emoji: '🪣' },
+            ],
+            'П': [
+                { id: 19, word: 'ПАУК', position: 'start', emoji: '🕷️' },
+                { id: 20, word: 'ПОМИДОР', position: 'start', emoji: '🍅' },
+                { id: 21, word: 'ЛОПАТА', position: 'middle', emoji: '🪣' },
+                { id: 22, word: 'ШАПКА', position: 'middle', emoji: '🧢' },
+                { id: 23, word: 'СУП', position: 'end', emoji: '🥣' },
+                { id: 24, word: 'УКРОП', position: 'end', emoji: '🌿' },
+            ],
+            'Р': [
+                { id: 127, word: 'РАК', position: 'start', emoji: '🦞' },
+                { id: 128, word: 'РЫБА', position: 'start', emoji: '🐟' },
+                { id: 129, word: 'КОРОВА', position: 'middle', emoji: '🐄' },
+                { id: 130, word: 'КОРОНА', position: 'middle', emoji: '👑' },
+                { id: 131, word: 'ТИГР', position: 'end', emoji: '🐅' },
+                { id: 132, word: 'СЫР', position: 'end', emoji: '🧀' },
+            ],
+            'С': [
+                { id: 133, word: 'СЛОН', position: 'start', emoji: '🐘' },
+                { id: 134, word: 'СЫР', position: 'start', emoji: '🧀' },
+                { id: 135, word: 'ЛИСА', position: 'middle', emoji: '🦊' },
+                { id: 136, word: 'ОСА', position: 'middle', emoji: '🐝' },
+                { id: 137, word: 'НОС', position: 'end', emoji: '👃' },
+                { id: 138, word: 'АВТОБУС', position: 'end', emoji: '🚌' },
+            ],
+            'Т': [
+                { id: 139, word: 'ТОРТ', position: 'start', emoji: '🎂' },
+                { id: 140, word: 'ТИГР', position: 'start', emoji: '🐅' },
+                { id: 141, word: 'УТКА', position: 'middle', emoji: '🦆' },
+                { id: 142, word: 'КОТ', position: 'middle', emoji: '🐈' },
+                { id: 143, word: 'ЗОНТ', position: 'end', emoji: '☂️' },
+                { id: 144, word: 'КИТ', position: 'end', emoji: '🐋' },
+            ],
+            'У': [
+                { id: 145, word: 'УТКА', position: 'start', emoji: '🦆' },
+                { id: 146, word: 'УЛИТКА', position: 'start', emoji: '🐌' },
+                { id: 147, word: 'ЛУК', position: 'middle', emoji: '🧅' },
+                { id: 148, word: 'ПАУК', position: 'middle', emoji: '🕷️' },
+                { id: 149, word: 'КЕНГУРУ', position: 'end', emoji: '🦘' },
+                { id: 150, word: 'КАКАДУ', position: 'end', emoji: '🦜' },
+            ],
+            'Ф': [
+                { id: 151, word: 'ФЛАГ', position: 'start', emoji: '🏁' },
+                { id: 152, word: 'ФОНАРЬ', position: 'start', emoji: '🔦' },
+                { id: 153, word: 'КОФТА', position: 'middle', emoji: '🧥' },
+                { id: 154, word: 'ТУФЛИ', position: 'middle', emoji: '👠' },
+                { id: 155, word: 'ШАРФ', position: 'end', emoji: '🧣' },
+                { id: 156, word: 'ЖИРАФ', position: 'end', emoji: '🦒' },
+            ],
+            'Х': [
+                { id: 157, word: 'ХЛЕБ', position: 'start', emoji: '🍞' },
+                { id: 158, word: 'ХОМЯК', position: 'start', emoji: '🐹' },
+                { id: 159, word: 'МУХА', position: 'middle', emoji: '🪰' },
+                { id: 160, word: 'ЧЕРЕПАХА', position: 'middle', emoji: '🐢' },
+                { id: 161, word: 'МОХ', position: 'end', emoji: '🌿' },
+                { id: 162, word: 'ПЕТУХ', position: 'end', emoji: '🐓' },
+            ],
+            'Ц': [
+                { id: 163, word: 'ЦЫПЛЕНОК', position: 'start', emoji: '🐥' },
+                { id: 164, word: 'ЦВЕТОК', position: 'start', emoji: '🌸' },
+                { id: 165, word: 'КОЛЬЦО', position: 'middle', emoji: '💍' },
+                { id: 166, word: 'ПУГОВИЦА', position: 'middle', emoji: '🔘' },
+                { id: 167, word: 'ОГУРЕЦ', position: 'end', emoji: '🥒' },
+                { id: 168, word: 'ДВОРЕЦ', position: 'end', emoji: '🏰' },
             ],
             'Ч': [
                 { id: 37, word: 'ЧАСЫ', position: 'start', emoji: '⏰' },
@@ -122,13 +267,37 @@
                 { id: 41, word: 'МЯЧ', position: 'end', emoji: '⚽' },
                 { id: 42, word: 'КЛЮЧ', position: 'end', emoji: '🔑' },
             ],
-            'В': [
-                { id: 43, word: 'ВОЛК', position: 'start', emoji: '🐺' },
-                { id: 44, word: 'ВАЗА', position: 'start', emoji: '🏺' },
-                { id: 45, word: 'СОВА', position: 'middle', emoji: '🦉' },
-                { id: 46, word: 'ДИВАН', position: 'middle', emoji: '🛋️' },
-                { id: 47, word: 'ЛЕВ', position: 'end', emoji: '🦁' },
-                { id: 48, word: 'ПЛОВ', position: 'end', emoji: '🥘' },
+            'Ш': [
+                { id: 169, word: 'ШАР', position: 'start', emoji: '🎈' },
+                { id: 170, word: 'ШАПКА', position: 'start', emoji: '🧢' },
+                { id: 171, word: 'МАШИНА', position: 'middle', emoji: '🚗' },
+                { id: 172, word: 'КОШКА', position: 'middle', emoji: '🐈' },
+                { id: 173, word: 'КАРАНДАШ', position: 'end', emoji: '✏️' },
+                { id: 174, word: 'ДУШ', position: 'end', emoji: '🚿' },
+            ],
+            'Щ': [
+                { id: 175, word: 'ЩУКА', position: 'start', emoji: '🐟' },
+                { id: 176, word: 'ЩЕТКА', position: 'start', emoji: '🧹' },
+                { id: 177, word: 'ЯЩИК', position: 'middle', emoji: '📦' },
+                { id: 178, word: 'ОВОЩИ', position: 'middle', emoji: '🥕' },
+                { id: 179, word: 'ПЛАЩ', position: 'end', emoji: '🧥' },
+                { id: 180, word: 'ЛЕЩ', position: 'end', emoji: '🐟' },
+            ],
+            'Ъ': [
+                { id: 181, word: 'ПОДЪЕЗД', position: 'middle', emoji: '🚪' },
+                { id: 182, word: 'ОБЪЯВЛЕНИЕ', position: 'middle', emoji: '📄' }
+            ],
+            'Ы': [
+                { id: 183, word: 'СЫР', position: 'middle', emoji: '🧀' },
+                { id: 184, word: 'МЫЛО', position: 'middle', emoji: '🧼' },
+                { id: 185, word: 'УСЫ', position: 'end', emoji: '👨' },
+                { id: 186, word: 'ЧАСЫ', position: 'end', emoji: '⏰' },
+            ],
+            'Ь': [
+                { id: 187, word: 'КОНЬКИ', position: 'middle', emoji: '⛸️' },
+                { id: 188, word: 'ПАЛЬМА', position: 'middle', emoji: '🌴' },
+                { id: 189, word: 'СОЛЬ', position: 'end', emoji: '🧂' },
+                { id: 190, word: 'РУЛЬ', position: 'end', emoji: '🚗' },
             ],
             'Э': [
                 { id: 49, word: 'ЭКРАН', position: 'start', emoji: '🖥️' },
@@ -146,11 +315,14 @@
                 { id: 59, word: 'МЕНЮ', position: 'end', emoji: '📋' },
                 { id: 60, word: 'ИНТЕРВЬЮ', position: 'end', emoji: '🎤' },
             ],
-            ...Array.from({ length: 32 }, (_, i) => {
-                const char = String.fromCharCode(1040 + i); 
-                if (['З','Л','Б','П','Д','Я','Ч','В','Э','Ю','Ё','Й','Ъ','Ы','Ь'].includes(char)) return {};
-                return { [char]: [] };
-            }).reduce((acc, curr) => ({...acc, ...curr}), {})
+            'Я': [
+                { id: 31, word: 'ЯБЛОКО', position: 'start', emoji: '🍎' },
+                { id: 32, word: 'ЯКОРЬ', position: 'start', emoji: '⚓' },
+                { id: 33, word: 'МАЯК', position: 'middle', emoji: '🗼' },
+                { id: 34, word: 'ПОЯС', position: 'middle', emoji: '🥋' },
+                { id: 35, word: 'ЗМЕЯ', position: 'end', emoji: '🐍' },
+                { id: 36, word: 'ФЕЯ', position: 'end', emoji: '🧚‍♀️' },
+            ]
         };
 
         const ALPHABET = [
