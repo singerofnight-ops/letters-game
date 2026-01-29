@@ -122,9 +122,33 @@
                 { id: 41, word: 'МЯЧ', position: 'end', emoji: '⚽' },
                 { id: 42, word: 'КЛЮЧ', position: 'end', emoji: '🔑' },
             ],
+            'В': [
+                { id: 43, word: 'ВОЛК', position: 'start', emoji: '🐺' },
+                { id: 44, word: 'ВАЗА', position: 'start', emoji: '🏺' },
+                { id: 45, word: 'СОВА', position: 'middle', emoji: '🦉' },
+                { id: 46, word: 'ДИВАН', position: 'middle', emoji: '🛋️' },
+                { id: 47, word: 'ЛЕВ', position: 'end', emoji: '🦁' },
+                { id: 48, word: 'ПЛОВ', position: 'end', emoji: '🥘' },
+            ],
+            'Э': [
+                { id: 49, word: 'ЭКРАН', position: 'start', emoji: '🖥️' },
+                { id: 50, word: 'ЭМУ', position: 'start', emoji: '🐦' },
+                { id: 51, word: 'ПОЭТ', position: 'middle', emoji: '📜' },
+                { id: 52, word: 'ДУЭТ', position: 'middle', emoji: '👯' },
+                { id: 53, word: 'АЛОЭ', position: 'end', emoji: '🪴' },
+                { id: 54, word: 'КАНОЭ', position: 'end', emoji: '🛶' },
+            ],
+            'Ю': [
+                { id: 55, word: 'ЮЛА', position: 'start', emoji: '🌪️' },
+                { id: 56, word: 'ЮБКА', position: 'start', emoji: '👗' },
+                { id: 57, word: 'ИНДЮК', position: 'middle', emoji: '🦃' },
+                { id: 58, word: 'БРЮКИ', position: 'middle', emoji: '👖' },
+                { id: 59, word: 'МЕНЮ', position: 'end', emoji: '📋' },
+                { id: 60, word: 'ИНТЕРВЬЮ', position: 'end', emoji: '🎤' },
+            ],
             ...Array.from({ length: 32 }, (_, i) => {
                 const char = String.fromCharCode(1040 + i); 
-                if (['З','Л','Б','П','Д','Я','Ч','Ё','Й','Ъ','Ы','Ь'].includes(char)) return {};
+                if (['З','Л','Б','П','Д','Я','Ч','В','Э','Ю','Ё','Й','Ъ','Ы','Ь'].includes(char)) return {};
                 return { [char]: [] };
             }).reduce((acc, curr) => ({...acc, ...curr}), {})
         };
